@@ -35,7 +35,7 @@
 
         <activity
             android:name=".MapsActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_maps"
             android:parentActivityName=".MainActivity"/>
         <activity
@@ -51,6 +51,16 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name=".PrijavaActivity"
+            android:label="prijava"
+            android:exported="true"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".RegistracijaActivity"
+            android:label="registracija"
+            android:exported="true"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

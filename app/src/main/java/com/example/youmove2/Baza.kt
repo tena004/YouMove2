@@ -30,6 +30,10 @@ class Baza(private val context: Context) : SQLiteOpenHelper(
         onCreate(db)
     }
 
+    /*fun checkUser(username: String){
+        val query = "SELECT * FROM user WHERE username =";
+    }*/
+
     fun readAllUsers(): Cursor? {
         val query = "SELECT * FROM user;"
         val db = this.readableDatabase

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegistracijaActivity">
+
+    <EditText
+        android:id="@+id/imePrezime"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="132dp"
+        android:layout_marginEnd="91dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:hint="Ime i prezime"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/korIme"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="91dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:hint="Korisničko ime"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/imePrezime"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/imePrezime"
+        app:layout_constraintTop_toBottomOf="@+id/imePrezime" />
+
+    <EditText
+        android:id="@+id/lozinka"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="91dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:hint="Lozinka"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/korIme"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/korIme"
+        app:layout_constraintTop_toBottomOf="@+id/korIme" />
+
+    <EditText
+        android:id="@+id/lozaPon"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="91dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:hint="Ponovite lozinku"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/lozinka"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/lozinka"
+        app:layout_constraintTop_toBottomOf="@+id/lozinka" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="84dp"
+        android:background="@drawable/button2"
+        android:onClick="rege"
+        android:text="Registracija"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/lozaPon"
+        app:layout_constraintStart_toStartOf="@+id/lozaPon"
+        app:layout_constraintTop_toBottomOf="@+id/lozaPon" />
+</androidx.constraintlayout.widget.ConstraintLayout>

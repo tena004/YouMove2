@@ -40,7 +40,7 @@
         android:text="Registracija"
         android:textColor="@color/text_blue"
         android:textSize="20dp"
-        android:onClick="prijava"
+        android:onClick="registracija"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
