@@ -2,14 +2,12 @@ package com.example.youmove2
 
 import android.content.Context
 import android.database.Cursor
-import android.database.sqlite.SQLiteOpenHelper
-import com.example.youmove2.Baza
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 
-class Baza(private val context: Context) : SQLiteOpenHelper(
-    context, DATABASE_NAME, null, DATABASE_VERSION
-) {
+class Baza(context: Context) : SQLiteOpenHelper(
+    context, "baza" , null, 1) {
     override fun onCreate(db: SQLiteDatabase) {
         val createUserTable = ("create table korisnik ("
                 + "_id" + " integer primary key autoincrement, "
@@ -20,7 +18,7 @@ class Baza(private val context: Context) : SQLiteOpenHelper(
                 + "trcanje" + " double default 0,"
                 + "level" + " integer default 1);")
         db.execSQL(createUserTable)
-        val createUniqueIndex = "CREATE UNIQUE INDEX IF NOT EXISTS user_ui ON user(username)"
+        val createUniqueIndex = "CREATE UNIQUE INDEX IF NOT EXISTS korisnik_ui ON korisnik(kor_ime)"
         db.execSQL(createUniqueIndex)
     }
 
@@ -30,9 +28,13 @@ class Baza(private val context: Context) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    /*fun checkUser(username: String){
-        val query = "SELECT * FROM user WHERE username =";
-    }*/
+    fun checkUser(username: String): Cursor? {
+        val query = "SELECT * FROM user WHERE username = " + username + ";"
+        var cursor: Cursor? = null
+        val db = this.readableDatabase
+        cursor = db.rawQuery(query, null)
+        return cursor
+    }
 
     fun readAllUsers(): Cursor? {
         val query = "SELECT * FROM user;"
@@ -44,8 +46,4 @@ class Baza(private val context: Context) : SQLiteOpenHelper(
         return cursor
     }
 
-    companion object {
-        private const val DATABASE_NAME = "userDatabase.db"
-        private const val DATABASE_VERSION = 1
-    }
 }

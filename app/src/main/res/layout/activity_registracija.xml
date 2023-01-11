@@ -77,7 +77,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="84dp"
         android:background="@drawable/button2"
-        android:onClick="rege"
         android:text="Registracija"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
