@@ -14,7 +14,6 @@ import com.example.youmove2.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding;
-    var session: SharedPrefs? = null
     var con: Context? = null
     var dbase: Baza? = null
 

@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.google.common.base.Strings
 
 val DATABASE_NAME = "baza.db"
 val DATABASE_VERSION = 1
@@ -36,14 +37,18 @@ class Baza(context: Context) : SQLiteOpenHelper(
         return cursor?.count
     }
 
-    fun readAllUsers(): Cursor? {
-        val query = "SELECT * FROM korisnik;"
+    fun prijavaProvjera(username: String,  password: String): Int {
+        val query = "SELECT _id FROM korisnik WHERE kor_ime = '" + username + "' AND lozinka = '" + password + "';"
         val db = this.readableDatabase
+        var id = -1
         var cursor: Cursor? = null
         if (db != null) {
             cursor = db.rawQuery(query, null)
         }
-        return cursor
+        if (cursor!!.moveToFirst()){
+            id = cursor!!.getInt(0)
+        }
+        return id
     }
 
 }

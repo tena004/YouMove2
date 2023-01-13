@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".PrijavaActivity">
 
+    <EditText
+        android:id="@+id/lozaPrijava"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:fontFamily="@font/raleway_extralight"
+        android:hint="Lozinka"
+        android:inputType="textPassword"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/korImePrijava"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/korImePrijava"
+        app:layout_constraintTop_toBottomOf="@+id/korImePrijava" />
+
+    <EditText
+        android:id="@+id/korImePrijava"
+        android:layout_width="267dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="196dp"
+        android:background="@drawable/rect"
+        android:ems="10"
+        android:fontFamily="@font/raleway_extralight"
+        android:hint="Korisničko ime"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonPrijava"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="268dp"
+        android:background="@drawable/button2"
+        android:fontFamily="@font/raleway_semibold"
+        android:paddingBottom="10dp"
+        android:text="Prijavi se"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/lozaPrijava"
+        app:layout_constraintStart_toStartOf="@+id/lozaPrijava"
+        app:layout_constraintTop_toBottomOf="@+id/lozaPrijava"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

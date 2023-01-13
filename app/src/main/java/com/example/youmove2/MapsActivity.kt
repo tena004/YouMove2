@@ -18,12 +18,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.tasks.OnSuccessListener
 
 
 class MapsActivity : AppCompatActivity(),
     OnMapReadyCallback {
-
+    var session: SharedPrefs? = null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
@@ -32,9 +31,12 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        session = SharedPrefs(applicationContext)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
