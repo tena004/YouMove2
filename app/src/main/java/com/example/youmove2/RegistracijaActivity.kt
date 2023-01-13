@@ -37,7 +37,7 @@ class RegistracijaActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Lozinke se ne podudaraju!", Toast.LENGTH_LONG)
                     .show()
             }
-            if((dbase?.checkUser(korIme))!=null){
+            if((dbase?.checkUser(korIme))!=0){
                 Toast.makeText(applicationContext, "Korisničko ime već postoji!", Toast.LENGTH_LONG)
                     .show()
             }else{
