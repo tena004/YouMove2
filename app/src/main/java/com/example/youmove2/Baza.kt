@@ -37,6 +37,21 @@ class Baza(context: Context) : SQLiteOpenHelper(
         return cursor?.count
     }
 
+    fun checkUserId(id: Int): Boolean {
+        var logged = false
+        val query = "SELECT * FROM korisnik WHERE _id = '" + id + "';"
+        var cursor: Cursor? = null
+        val db = this.readableDatabase
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+        Log.d("VALUE cur = ", cursor?.count.toString());
+        if (cursor?.count!! > 0) {
+            logged = true
+        }
+        return logged
+    }
+
     fun prijavaProvjera(username: String,  password: String): Int {
         val query = "SELECT _id FROM korisnik WHERE kor_ime = '" + username + "' AND lozinka = '" + password + "';"
         val db = this.readableDatabase

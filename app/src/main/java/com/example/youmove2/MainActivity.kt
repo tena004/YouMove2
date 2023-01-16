@@ -15,7 +15,6 @@ import com.example.youmove2.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding;
     var con: Context? = null
-    var dbase: Baza? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -23,7 +22,6 @@ class MainActivity : AppCompatActivity() {
         val backgorund : Drawable?
         val window: Window = this.window
 
-        dbase = Baza(this)
 
         backgorund = ContextCompat.getDrawable(this, R.drawable.home_bg)
 

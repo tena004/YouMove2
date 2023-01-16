@@ -3,13 +3,17 @@ package com.example.youmove2
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import com.example.youmove2.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -31,8 +35,39 @@ class MapsActivity : AppCompatActivity(),
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     var prefs: UserPrefs?  = null
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.action_info -> {
+                val iInformation = Intent(this, UserProfileActivity::class.java)
+                startActivity(iInformation)
+                true
+            }
+            R.id.action_settings -> {
+                val iSettings = Intent(this, SettingsActivity::class.java)
+                startActivity(iSettings)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val backgorund : Drawable?
+        backgorund = ContextCompat.getDrawable(this, R.drawable.home_bg)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.setBackgroundDrawable(backgorund)
+
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)

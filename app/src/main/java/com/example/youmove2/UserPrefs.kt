@@ -6,7 +6,7 @@ import androidx.datastore.DataStore
 import androidx.datastore.preferences.*
 import kotlinx.coroutines.flow.first
 
-const val PREFERENCE_NAME = "active_user"
+const val PREFERENCE_NAME = "active_user.xml"
 
 class UserPrefs(context: Context){
 
