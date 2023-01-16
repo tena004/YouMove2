@@ -6,9 +6,11 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.youmove2.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -18,25 +20,29 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.launch
 
 
 class MapsActivity : AppCompatActivity(),
     OnMapReadyCallback {
-    var session: SharedPrefs? = null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    var prefs: UserPrefs?  = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        session = SharedPrefs(applicationContext)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        prefs = UserPrefs(this)
 
+        lifecycleScope.launch {
+            Toast.makeText(applicationContext, prefs!!.getUserId().toString(), Toast.LENGTH_LONG).show()
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 

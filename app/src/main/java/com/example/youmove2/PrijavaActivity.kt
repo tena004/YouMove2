@@ -2,23 +2,35 @@ package com.example.youmove2
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.youmove2.databinding.ActivityPrijavaBinding
 import com.google.common.hash.Hashing
+import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 
 class PrijavaActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPrijavaBinding
     var dbase : Baza? = null
-    var session: SharedPrefs? = null
+    var prefs: UserPrefs?  = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         viewBinding = ActivityPrijavaBinding.inflate(layoutInflater)
         supportActionBar?.hide()
 
-        session = SharedPrefs(applicationContext)
         dbase = Baza(this)
+
+        prefs = UserPrefs(this)
+
+        val window: Window = this.window
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.setBackgroundDrawable(getDrawable(R.color.white))
 
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
@@ -36,7 +48,10 @@ class PrijavaActivity : AppCompatActivity() {
                         "Pogrešno korisničko ime ili lozinka!",
                         Toast.LENGTH_SHORT).show()
                 }else{
-                    session?.logInSession(korIme, dbase!!.prijavaProvjera(korIme, hashPwd(lozinka)).toString())
+                    lifecycleScope.launch{
+                        var id = dbase!!.prijavaProvjera(korIme, hashPwd(lozinka))
+                        prefs!!.logInSession(id)
+                    }
                     val iMapa = Intent(this, MapsActivity::class.java)
                     startActivity(iMapa)
                 }

@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         dbase = Baza(this)
 
         backgorund = ContextCompat.getDrawable(this, R.drawable.home_bg)
+
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.setBackgroundDrawable(backgorund)
         supportActionBar?.hide()

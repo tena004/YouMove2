@@ -15,16 +15,16 @@
         android:layout_marginBottom="296dp"
         android:background="@drawable/btn"
         android:fontFamily="@font/raleway_semibold"
+        android:onClick="prijava"
         android:paddingBottom="5dp"
         android:text="prijava"
         android:textColor="@color/text_blue"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/registracija_btn"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/registracija_btn"
         app:layout_constraintTop_toBottomOf="@+id/registracija_btn"
-        android:onClick="prijava"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
@@ -32,16 +32,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="109dp"
-        android:layout_marginTop="241dp"
+        android:layout_marginTop="268dp"
         android:layout_marginEnd="109dp"
         android:background="@drawable/btn"
         android:fontFamily="@font/raleway_semibold"
+        android:onClick="registracija"
         android:paddingBottom="5dp"
         android:text="Registracija"
         android:textColor="@color/text_blue"
         android:textSize="20dp"
-        android:onClick="registracija"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
