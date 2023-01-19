@@ -3,12 +3,17 @@ package com.example.youmove2
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,13 +26,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MapsActivity : AppCompatActivity(),
-    OnMapReadyCallback {
+    OnMapReadyCallback, TextToSpeech.OnInitListener{
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
+    private var tts: TextToSpeech? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -63,7 +71,12 @@ class MapsActivity : AppCompatActivity(),
         window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
 
+        /*val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)*/
+
         super.onCreate(savedInstanceState)
+
+        tts = TextToSpeech(this,this)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -156,7 +169,18 @@ class MapsActivity : AppCompatActivity(),
             )
         }
     }
+    private fun speakOut(text: String) {
+        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }
 
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts!!.setLanguage(Locale.US)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                Toast.makeText(this, "Language specified not supported", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 
 

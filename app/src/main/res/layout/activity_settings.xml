@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/settings_bg"
     tools:context=".SettingsActivity">
 
     <TextView
@@ -15,6 +14,7 @@
         android:text="@string/settings"
         android:textSize="25dp"
         android:fontFamily="@font/julius"
+        android:textColor="@color/dark_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,37 +36,54 @@
     <Switch
         android:id="@+id/ttsOnOff"
         android:layout_width="match_parent"
-        android:layout_height="57dp"
-        android:paddingStart="100dp"
+        android:layout_height="60dp"
+        android:paddingStart="90dp"
         android:paddingTop="20dp"
         android:paddingEnd="100dp"
         android:paddingBottom="20dp"
         android:scaleX="1.5"
         android:scaleY="1.5"
         android:text="Text-to-speech"
+        android:textSize="13dp"
+        android:fontFamily="@font/julius"
         android:textColor="@color/dark_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.136" />
+        app:layout_constraintVertical_bias="0.135" />
 
-    <Switch
-        android:id="@+id/fontSize"
-        android:layout_width="match_parent"
-        android:layout_height="62dp"
-        android:layout_marginTop="36dp"
-        android:paddingStart="100dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="100dp"
-        android:paddingBottom="20dp"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
+    <SeekBar
+        android:id="@+id/seekBar2"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="180dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:max="2"
+        android:progress="0"
+        android:progressBackgroundTint="#000000"
+        android:progressTint="#2EBFA5"
+        android:thumbTint="#2EBFA5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.661"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/ttsOnOff"
+        app:tickMarkTint="#000000" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="185dp"
+        android:layout_height="49dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/julius"
         android:text="Veličina fonta"
         android:textColor="@color/dark_gray"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.173"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ttsOnOff" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

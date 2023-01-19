@@ -68,23 +68,7 @@ class RegistracijaActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                /*val userValues = ContentValues()
-                userValues.put("ime", imePrez)
-                userValues.put("kor_ime", korIme)
-                userValues.put("lozinka", hashPwd(lozinka))
-                var rowid = db?.insert("korisnik", null, userValues)
-                if (rowid == -1L) {
-                    Toast.makeText(
-                        this@RegistracijaActivity,
-                        "Neupsješna registracija!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
 
-                    Toast.makeText(this, "Uspješno ste registrirani!", Toast.LENGTH_LONG).show()
-                    val iMaps = Intent(this, MapsActivity::class.java)
-                    startActivity(iMaps)
-                }*/
             }
         }
     }

@@ -16,7 +16,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME , null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "hodanje" + " double default 0," + "trcanje" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1);"
+        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "hodanje" + " double default 0," + "trcanje" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1," + "tts" + " integer default 0," + "font" + " integer default 0);"
         db.execSQL(createUserTable)
         val createUniqueIndex = "CREATE UNIQUE INDEX IF NOT EXISTS korisnik_ui ON korisnik(kor_ime)"
         db.execSQL(createUniqueIndex)
@@ -69,17 +69,21 @@ class Baza(context: Context) : SQLiteOpenHelper(
         }
         if (cursor!!.moveToFirst()){
             id = cursor!!.getInt(0)
+            cursor.close()
         }
+        var cursorNew: Cursor? = null
         if(id == -1){
             return false
         }else{
             val query = "UPDATE korisnik SET ulogiran = 1 WHERE _id = $id;"
-            db.rawQuery(query, null)
+            cursorNew = db.rawQuery(query, null)
+            cursorNew.moveToFirst()
+            cursorNew.close()
             return true
         }
     }
 
-    fun getLoggedInUser(): Boolean {
+    fun isLogged(): Boolean {
         val query = "SELECT _id FROM korisnik WHERE ulogiran = " + 1 + ";"
         val db = this.readableDatabase
         var id = -1
@@ -91,6 +95,20 @@ class Baza(context: Context) : SQLiteOpenHelper(
             id = cursor!!.getInt(0)
         }
         return id != -1
+    }
+
+    fun getLoggedInUser(): Int {
+        val query = "SELECT _id FROM korisnik WHERE ulogiran = " + 1 + ";"
+        val db = this.readableDatabase
+        var id = -1
+        var cursor: Cursor? = null
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+        if (cursor!!.moveToFirst()){
+            id = cursor!!.getInt(0)
+        }
+        return id
     }
 
     fun getUserDetails(array: MutableList<String> = ArrayList()) {
@@ -117,27 +135,30 @@ class Baza(context: Context) : SQLiteOpenHelper(
         array.add(trcanje)
         array.add(level)
 
-        //ova funkcija ne bi trebala vraćati ništa, samo napuniti polje podacima, ovaj string ime je samo za testiranje
-
     }
 
 
     fun logOut(){
-        val query = "SELECT _id FROM korisnik WHERE ulogiran = " + 1 + ";"
-        val db = this.writableDatabase
-        var id = -1
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET ulogiran = 0 WHERE _id = $id;"
         var cursor: Cursor? = null
-        if (db != null) {
-            cursor = db.rawQuery(query, null)
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
         }
-        if (cursor!!.moveToFirst()){
-            id = cursor!!.getInt(0)
-        }
+    }
 
-        if(id != -1){
-            val queryLogOut = "UPDATE korisnik SET ulogiran = 0 WHERE _id = $id;"
-            db.rawQuery(queryLogOut, null)
-
+    fun ttsOnOff(i: Int){
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET tts = $i WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
         }
     }
 

@@ -12,23 +12,25 @@ import java.util.*
 class SettingsActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var viewBinding: ActivitySettingsBinding
     private var tts: TextToSpeech? = null
+    var dbase: Baza? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
         supportActionBar?.hide()
 
-        var backgorund = ContextCompat.getDrawable(this, R.color.white)
+        var backgorund = ContextCompat.getDrawable(this, R.drawable.settings_bg)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.setBackgroundDrawable(backgorund)
 
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.holo_blue_light)
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
 
         var iv = viewBinding.imageView2
         iv.setImageResource(R.drawable.setting2)
         iv.setColorFilter(resources.getColor(R.color.dark_gray))
 
+        dbase = Baza(this)
         tts = TextToSpeech(this,this)
 
         super.onCreate(savedInstanceState)
@@ -36,8 +38,10 @@ class SettingsActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
 
         viewBinding.ttsOnOff.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
+                dbase!!.ttsOnOff(1)
                 speakOut("Text to speech on")
             } else {
+                dbase!!.ttsOnOff(0)
                 speakOut("Text to speech off")
             }
         }

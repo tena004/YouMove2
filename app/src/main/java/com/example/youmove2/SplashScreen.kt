@@ -23,7 +23,7 @@ class SplashScreen: AppCompatActivity() {
 
         dbase = Baza(this)
 
-        logged = dbase!!.getLoggedInUser()
+        logged = dbase!!.isLogged()
 
         val window: Window = this.window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)

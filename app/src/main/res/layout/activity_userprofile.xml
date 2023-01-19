@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/userprofile_bg"
     tools:context=".UserProfileActivity">
 
     <ImageView
@@ -12,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-
         android:layout_marginTop="80dp"
         android:src="@drawable/user_profile_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,23 +18,27 @@
 
     <TextView
         android:id="@+id/imePrezimeTextView"
-        android:layout_width="153dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="52dp"
+        android:layout_width="248dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="36dp"
         android:fontFamily="@font/julius"
         android:text="TextView"
         android:textAllCaps="true"
-        android:textSize="14dp"
+        android:textColor="@color/dark_gray"
+        android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/profilePhoto"
         app:layout_constraintTop_toTopOf="@+id/profilePhoto" />
 
     <TextView
         android:id="@+id/walkedTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="363dp"
+        android:layout_height="29dp"
         android:layout_marginTop="64dp"
-        android:text="Meters walked:"
+        android:fontFamily="@font/julius"
+        android:text="Metara prehodano:  "
+        android:textColor="@color/dark_gray"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="@+id/profilePhoto"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/profilePhoto"
@@ -44,10 +46,13 @@
 
     <TextView
         android:id="@+id/runnedTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="365dp"
+        android:layout_height="26dp"
         android:layout_marginTop="36dp"
-        android:text="Meters runned:"
+        android:fontFamily="@font/julius"
+        android:text="Metara pretrčano:  "
+        android:textColor="@color/dark_gray"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="@+id/walkedTextView"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/walkedTextView"
@@ -55,10 +60,13 @@
 
     <TextView
         android:id="@+id/levelTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="363dp"
+        android:layout_height="25dp"
         android:layout_marginTop="36dp"
-        android:text="Level"
+        android:fontFamily="@font/julius"
+        android:text="Razina:  "
+        android:textColor="@color/dark_gray"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="@+id/runnedTextView"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/runnedTextView"
@@ -69,7 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="76dp"
-        android:layout_marginBottom="113dp"
+        android:layout_marginBottom="160dp"
         android:background="@drawable/button2"
         android:fontFamily="@font/raleway_semibold"
         android:paddingBottom="10dp"
@@ -77,6 +85,6 @@
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imePrezimeTextView"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toStartOf="@+id/levelTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
