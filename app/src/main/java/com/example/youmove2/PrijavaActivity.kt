@@ -7,7 +7,6 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.example.youmove2.databinding.ActivityPrijavaBinding
 import com.google.common.hash.Hashing
 import kotlinx.coroutines.launch
@@ -16,15 +15,12 @@ import java.nio.charset.StandardCharsets
 class PrijavaActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPrijavaBinding
     var dbase : Baza? = null
-    var prefs: UserPrefs?  = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         viewBinding = ActivityPrijavaBinding.inflate(layoutInflater)
         supportActionBar?.hide()
 
         dbase = Baza(this)
-
-        prefs = UserPrefs(this)
 
         val window: Window = this.window
 
@@ -43,15 +39,11 @@ class PrijavaActivity : AppCompatActivity() {
             if (korIme.isEmpty() ||  lozinka.isEmpty()) {
                 Toast.makeText(applicationContext, "Popunite sva polja!", Toast.LENGTH_LONG).show()
             }else{
-                if(dbase!!.prijavaProvjera(korIme, hashPwd(lozinka)) == -1) {
+                if(!dbase!!.prijavaProvjera(korIme, hashPwd(lozinka))) {
                     Toast.makeText(applicationContext,
                         "Pogrešno korisničko ime ili lozinka!",
                         Toast.LENGTH_SHORT).show()
                 }else{
-                    lifecycleScope.launch{
-                        var id = dbase!!.prijavaProvjera(korIme, hashPwd(lozinka))
-                        prefs!!.logInSession(id)
-                    }
                     val iMapa = Intent(this, MapsActivity::class.java)
                     startActivity(iMapa)
                 }

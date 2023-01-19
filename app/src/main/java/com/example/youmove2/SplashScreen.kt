@@ -9,15 +9,13 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import com.example.youmove2.databinding.ActivitySettingsBinding
 import com.example.youmove2.databinding.ActivitySplashscreenBinding
 import kotlinx.coroutines.launch
 
 class SplashScreen: AppCompatActivity() {
     private lateinit var viewBinding: ActivitySplashscreenBinding
-    var prefs: UserPrefs?  = null
     var dbase: Baza? = null
+    private var logged: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         viewBinding = ActivitySplashscreenBinding.inflate(layoutInflater)
@@ -25,7 +23,7 @@ class SplashScreen: AppCompatActivity() {
 
         dbase = Baza(this)
 
-        var logged = false
+        logged = dbase!!.getLoggedInUser()
 
         val window: Window = this.window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -35,11 +33,6 @@ class SplashScreen: AppCompatActivity() {
         window.setBackgroundDrawable(getDrawable(R.color.black))
 
         viewBinding.imageView.setImageResource(R.drawable.logo)
-
-        lifecycleScope.launch {
-            if(prefs?.getUserId()!=null){ logged = true}
-            Toast.makeText(applicationContext, prefs?.getUserId().toString(), Toast.LENGTH_LONG).show()
-        }
 
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
