@@ -1,11 +1,11 @@
 package com.example.youmove2
 
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import com.google.common.base.Strings
 
 val DATABASE_NAME = "baza.db"
 val DATABASE_VERSION = 2
@@ -70,6 +70,55 @@ class Baza(context: Context) : SQLiteOpenHelper(
             id = cursor!!.getInt(0)
         }
         return id != -1
+    }
+
+    fun getUserDetails(array: MutableList<String> = ArrayList()) {
+        val query = "SELECT * FROM korisnik WHERE ulogiran = " + 1 + ";"
+        val db = this.readableDatabase
+        var cursor: Cursor? = null
+        var imePrez = ""
+        var hodanje = ""
+        var trcanje = ""
+        var level = ""
+
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+        if (cursor!!.moveToFirst()){
+            imePrez = cursor!!.getString(1)
+            hodanje = cursor!!.getFloat(4).toString()
+            trcanje = cursor!!.getFloat(5).toString()
+            level = cursor!!.getInt(6).toString()
+        }
+
+        array.add(imePrez)
+        array.add(hodanje)
+        array.add(trcanje)
+        array.add(level)
+
+        //ova funkcija ne bi trebala vraćati ništa, samo napuniti polje podacima, ovaj string ime je samo za testiranje
+
+    }
+
+
+    fun logOut(){
+        val query = "SELECT _id FROM korisnik WHERE ulogiran = " + 1 + ";"
+        val db = this.readableDatabase
+        var id = -1
+        var cursor: Cursor? = null
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+        if (cursor!!.moveToFirst()){
+            id = cursor!!.getInt(0)
+        }
+
+        if(id != -1){
+            val queryLogOut = "UPDATE korisnik SET ulogiran = 0 WHERE _id = $id;"
+            db.rawQuery(queryLogOut, null)
+
+        }
+
     }
 
 }
