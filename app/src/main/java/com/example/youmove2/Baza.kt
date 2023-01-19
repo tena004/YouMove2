@@ -1,11 +1,13 @@
 package com.example.youmove2
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import android.widget.Toast
 
 val DATABASE_NAME = "baza.db"
 val DATABASE_VERSION = 2
@@ -24,6 +26,25 @@ class Baza(context: Context) : SQLiteOpenHelper(
         db.execSQL("drop table korisnik")
         Log.i("izmjena_verzije", "dropa tablicu")
         onCreate(db)
+    }
+
+    fun registration(username: String, password: String, name: String) : Boolean{
+        var db = this.writableDatabase
+        val userValues = ContentValues()
+        userValues.put("ime", name)
+        userValues.put("kor_ime", username)
+        userValues.put("lozinka", password)
+
+        var uspjesnaReg = false
+
+        var rowid = db?.insert("korisnik", null, userValues)
+
+        if (rowid != -1L) {
+            uspjesnaReg = true
+        }
+
+        return uspjesnaReg
+
     }
 
     fun checkUser(username: String): Int? {
@@ -103,7 +124,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
 
     fun logOut(){
         val query = "SELECT _id FROM korisnik WHERE ulogiran = " + 1 + ";"
-        val db = this.readableDatabase
+        val db = this.writableDatabase
         var id = -1
         var cursor: Cursor? = null
         if (db != null) {
@@ -118,7 +139,6 @@ class Baza(context: Context) : SQLiteOpenHelper(
             db.rawQuery(queryLogOut, null)
 
         }
-
     }
 
 }

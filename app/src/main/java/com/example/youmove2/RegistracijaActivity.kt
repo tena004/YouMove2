@@ -35,7 +35,7 @@ class RegistracijaActivity : AppCompatActivity() {
         btnReg.setOnClickListener{
             val korIme = viewBinding.korIme.text.toString()
             val imePrez = viewBinding.imePrezime.text.toString()
-            val lozinka = viewBinding.lozinka.text.toString()
+            var lozinka = viewBinding.lozinka.text.toString()
             val lozProvjera = viewBinding.lozaPon.text.toString()
 
             dbase = Baza(this)
@@ -52,7 +52,23 @@ class RegistracijaActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Korisničko ime već postoji!", Toast.LENGTH_LONG)
                     .show()
             }else{
-                val userValues = ContentValues()
+                lozinka = hashPwd(lozinka)
+
+                var registracija = dbase!!.registration(korIme, lozinka, imePrez)
+
+                if(registracija){
+                    dbase!!.prijavaProvjera(korIme, lozinka)
+                    Toast.makeText(this, "Uspješno ste registrirani!", Toast.LENGTH_LONG).show()
+                    val iMaps = Intent(this, MapsActivity::class.java)
+                    startActivity(iMaps)
+                }else{
+                    Toast.makeText(
+                        this@RegistracijaActivity,
+                        "Neupsješna registracija!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                /*val userValues = ContentValues()
                 userValues.put("ime", imePrez)
                 userValues.put("kor_ime", korIme)
                 userValues.put("lozinka", hashPwd(lozinka))
@@ -64,16 +80,16 @@ class RegistracijaActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    dbase!!.logOut()
+
                     Toast.makeText(this, "Uspješno ste registrirani!", Toast.LENGTH_LONG).show()
                     val iMaps = Intent(this, MapsActivity::class.java)
                     startActivity(iMaps)
-                }
+                }*/
             }
         }
     }
 
-    fun hashPwd(password: String?): String? {
+    fun hashPwd(password: String?): String {
         return Hashing.sha256()
             .hashString(password, StandardCharsets.UTF_8)
             .toString()
