@@ -137,7 +137,6 @@ class Baza(context: Context) : SQLiteOpenHelper(
 
     }
 
-
     fun logOut(){
         var id = this.getLoggedInUser()
         val queryLogOut = "UPDATE korisnik SET ulogiran = 0 WHERE _id = $id;"
@@ -159,6 +158,50 @@ class Baza(context: Context) : SQLiteOpenHelper(
             cursor = db.rawQuery(queryLogOut, null)
             cursor!!.moveToFirst()
             cursor.close()
+        }
+    }
+
+    fun checkTtS(id: Int): Boolean{
+        var id = this.getLoggedInUser()
+        val queryLogOut = "SELECT tts FROM korisnik WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.readableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            var tts = cursor!!.getInt(0)
+            cursor.close()
+            return  tts != 0
+        }else{
+            return false
+        }
+    }
+
+    fun fontSize(i: Int){
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET font = $i WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
+        }
+    }
+
+    fun checkFont(): Int{
+        var id = this.getLoggedInUser()
+        val queryLogOut = "SELECT font FROM korisnik WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.readableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            var font = cursor!!.getInt(0)
+            cursor.close()
+            return  font
+        }else{
+            return -1
         }
     }
 
