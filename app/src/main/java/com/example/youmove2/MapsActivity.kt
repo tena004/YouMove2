@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.os.Bundle
@@ -31,7 +33,7 @@ import kotlin.collections.ArrayList
 
 
 class MapsActivity : AppCompatActivity(),
-    OnMapReadyCallback, TextToSpeech.OnInitListener{
+    OnMapReadyCallback, SensorEventListener, TextToSpeech.OnInitListener{
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
@@ -71,8 +73,15 @@ class MapsActivity : AppCompatActivity(),
         window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
 
-        /*val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)*/
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        if (sensorManager != null) {
+            val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+            if (sensor != null){
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+        }else{
+            Toast.makeText(applicationContext, "Sensor service not detected", Toast.LENGTH_SHORT).show()
+        }
 
         super.onCreate(savedInstanceState)
 
@@ -182,6 +191,13 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
+    override fun onSensorChanged(p0: SensorEvent?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+        TODO("Not yet implemented")
+    }
 
 
 }
