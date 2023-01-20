@@ -205,5 +205,41 @@ class Baza(context: Context) : SQLiteOpenHelper(
         }
     }
 
+    fun updateTrcanje(m: Float){
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET trcanje = trcanje + $m WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
+        }
+    }
+
+    fun updateHodanje(m: Float){
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET hodanje = hodanje + $m WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
+        }
+    }
+
+    fun updateLevel(){
+        var id = this.getLoggedInUser()
+        val queryLogOut = "UPDATE korisnik SET level = level + 1 WHERE _id = $id;"
+        var cursor: Cursor? = null
+        val db = this.writableDatabase
+        if (db != null && id != -1) {
+            cursor = db.rawQuery(queryLogOut, null)
+            cursor!!.moveToFirst()
+            cursor.close()
+        }
+    }
+
 }
 
