@@ -42,7 +42,7 @@ import java.util.*
 
 
 class MapsActivity : AppCompatActivity(),
-    OnMapReadyCallback, SensorEventListener, EasyPermissions.PermissionCallbacks, TextToSpeech.OnInitListener{
+    OnMapReadyCallback, SensorEventListener, /*EasyPermissions.PermissionCallbacks,*/ TextToSpeech.OnInitListener{
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
@@ -90,18 +90,22 @@ class MapsActivity : AppCompatActivity(),
 
         super.onCreate(savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            && !ActivityTransitionsUtil.hasActivityTransitionPermissions(this)
-        ) {
-            requestActivityTransitionPermission()
-        } else {
-            requestForUpdates()
-        }
+
 
         tts = TextToSpeech(this,this)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.startBtn.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                && !ActivityTransitionsUtil.hasActivityTransitionPermissions(this)
+            ) {
+                requestActivityTransitionPermission()
+            } else {
+                requestForUpdates()
+            }
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -202,13 +206,13 @@ class MapsActivity : AppCompatActivity(),
 
     }
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event != null) {
+        /*if (event != null) {
             Log.d(
                 "acc", "x = ${event.values[0]}\n\n" +
                         "y = ${event.values[1]}\n\n" +
                         "z = ${event.values[2]}\n\n"
             )
-        }
+        }*/
     }
 
     // Akcelerometar
@@ -221,7 +225,18 @@ class MapsActivity : AppCompatActivity(),
         super.onDestroy()
     }
 
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+    //ActivityRecognitionAPI
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        } else {
+            requestActivityTransitionPermission()
+        }
+    }
+
+    fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
         requestForUpdates()
     }
 
@@ -234,22 +249,11 @@ class MapsActivity : AppCompatActivity(),
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
-    private fun requestForUpdates() {
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
+
+
+    @SuppressLint("MissingPermission")
+    private fun requestForUpdates() {
         client
             .requestActivityTransitionUpdates(
                 ActivityTransitionsUtil.getActivityTransitionRequest(),
@@ -263,14 +267,7 @@ class MapsActivity : AppCompatActivity(),
             }
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            AppSettingsDialog.Builder(this).build().show()
-        } else {
-            requestActivityTransitionPermission()
-        }
-    }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun requestActivityTransitionPermission() {
@@ -288,7 +285,7 @@ class MapsActivity : AppCompatActivity(),
             this,
             Constants.REQUEST_CODE_INTENT_ACTIVITY_TRANSITION,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 
