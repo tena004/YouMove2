@@ -1,9 +1,9 @@
 package com.example.youmove2
 
-
 import android.Manifest
+import android.R.attr
 import android.annotation.SuppressLint
-import android.app.PendingIntent
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -12,23 +12,19 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.os.Build
+import android.os.AsyncTask
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.youmove2.databinding.ActivityMapsBinding
-import com.example.youmove2.reciever.ActivityTransitionReceiver
-import com.example.youmove2.util.ActivityTransitionsUtil
-import com.example.youmove2.util.Constants
-import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -36,10 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import pub.devrel.easypermissions.AppSettingsDialog
-import pub.devrel.easypermissions.EasyPermissions
 import java.util.*
-
 
 class MapsActivity : AppCompatActivity(),
     OnMapReadyCallback, SensorEventListener, /*EasyPermissions.PermissionCallbacks,*/ TextToSpeech.OnInitListener{
@@ -47,9 +40,14 @@ class MapsActivity : AppCompatActivity(),
     private lateinit var binding: ActivityMapsBinding
     private var initial_zoom = 14f
     private var tts: TextToSpeech? = null
+    private val GEOFENCE_RADIUS = 1000f
+    private val GEOFENCE_ID = 101
+    private lateinit var geofencingClient: GeofencingClient
+    private lateinit var geofenceHelper: GeofenceHelper
     private lateinit var sensorManager: SensorManager
-    lateinit var client: ActivityRecognitionClient
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var home : LatLng
+    private lateinit var goal : LatLng
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -74,9 +72,9 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         val backgorund : Drawable?
-        client = ActivityRecognition.getClient(this)
 
         backgorund = ContextCompat.getDrawable(this, R.drawable.home_bg)
 
@@ -90,22 +88,13 @@ class MapsActivity : AppCompatActivity(),
 
         super.onCreate(savedInstanceState)
 
-
+        geofencingClient = LocationServices.getGeofencingClient(this)
+        geofenceHelper = GeofenceHelper(this);
 
         tts = TextToSpeech(this,this)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.startBtn.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                && !ActivityTransitionsUtil.hasActivityTransitionPermissions(this)
-            ) {
-                requestActivityTransitionPermission()
-            } else {
-                requestForUpdates()
-            }
-        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -120,6 +109,8 @@ class MapsActivity : AppCompatActivity(),
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         enableMyLocation();
+        home = LatLng(0.0, 0.0)
+        //var bm : Bitmap = decodeResource(this.getResources(), R.drawable.finish)
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -127,7 +118,7 @@ class MapsActivity : AppCompatActivity(),
 
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? -> // Got last known location. In some rare situations this can be null.
-                val home: LatLng = if (location != null) {
+                home = if (location != null) {
                     // Pan the camera to location
                     LatLng(location.latitude, location.longitude)
                 } else {
@@ -141,11 +132,58 @@ class MapsActivity : AppCompatActivity(),
                 )
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, initial_zoom))
+                goal = getRandomMarker(home, GEOFENCE_RADIUS)
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(goal)
+                       // .icon(BitmapDescriptorFactory.fromBitmap(bm))
+                )
                 }
+
+        addGeofence(home, GEOFENCE_RADIUS);
 
         mMap.isMyLocationEnabled = true // Show current location
 
+        val url: String = getMapsApiDirectionsUrl(home, goal)
 
+    }
+
+    fun getRandomMarker(point: LatLng, radius: Float): LatLng {
+        val randomPoints: MutableList<LatLng> = ArrayList()
+        val randomDistances: MutableList<Float> = ArrayList()
+        val myLocation = Location("")
+        myLocation.latitude = point.latitude
+        myLocation.longitude = point.longitude
+
+        //This is to generate 10 random points
+        for (i in 0..9) {
+            val x0 = point.latitude
+            val y0 = point.longitude
+            val random = Random()
+
+            // Convert radius from meters to degrees
+            val radiusInDegrees = (radius / 111000f).toDouble()
+            val u = random.nextDouble()
+            val v = random.nextDouble()
+            val w = radiusInDegrees * Math.sqrt(u)
+            val t = 2 * Math.PI * v
+            val x = w * Math.cos(t)
+            val y = w * Math.sin(t)
+
+            // Adjust the x-coordinate for the shrinking of the east-west distances
+            val new_x = x / Math.cos(y0)
+            val foundLatitude = new_x + x0
+            val foundLongitude = y + y0
+            val randomLatLng = LatLng(foundLatitude, foundLongitude)
+            randomPoints.add(randomLatLng)
+            val l1 = Location("")
+            l1.latitude = randomLatLng.latitude
+            l1.longitude = randomLatLng.longitude
+            randomDistances.add(l1.distanceTo(myLocation))
+        }
+        //Get nearest point to the centre
+        val indexOfNearestPointToCentre = randomDistances.indexOf(Collections.min(randomDistances))
+        return randomPoints[indexOfNearestPointToCentre]
     }
 
     private fun enableMyLocation() {
@@ -190,6 +228,81 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
+    @SuppressLint("MissingPermission")
+    fun addGeofence(latLng : LatLng, radius: Float) {
+        val geofence = geofenceHelper.getGeofence(
+            GEOFENCE_ID,
+            latLng,
+            attr.radius.toFloat(),
+            Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_EXIT
+        )
+        val geofencingRequest = geofenceHelper.getGeofencingRequest(geofence)
+        val pendingIntent = geofenceHelper.getThatPendingIntent()
+
+        geofencingClient.addGeofences(geofencingRequest!!, pendingIntent!!)
+            .addOnSuccessListener { Log.d(TAG, "onSuccess: Geofence Added...") }
+            .addOnFailureListener { e ->
+                val errorMessage = geofenceHelper.getErrorString(e)
+                Log.d(TAG, "onFailure: $errorMessage")
+            }
+    }
+
+    private fun getMapsApiDirectionsUrl(origin: LatLng, dest: LatLng): String {
+
+        // Origin of route
+        val str_origin = "origin=" + origin.latitude + "," + origin.longitude
+
+        // Destination of route
+        val str_dest = "destination=" + dest.latitude + "," + dest.longitude
+
+        // Sensor enabled
+        val sensor = "sensor=false"
+
+        // Building the parameters to the web service
+        val parameters = "$str_origin&$str_dest&$sensor"
+
+        // Output format
+        val output = "json"
+        return "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
+    }
+
+   /*
+
+    private fun decodePoly(encoded: String): List<LatLng>? {
+        val poly: MutableList<LatLng> = ArrayList()
+        var index = 0
+        val len = encoded.length
+        var lat = 0
+        var lng = 0
+        while (index < len) {
+            var b: Int
+            var shift = 0
+            var result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lat += dlat
+            shift = 0
+            result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lng += dlng
+            val p = LatLng(
+                lat.toDouble() / 1E5,
+                lng.toDouble() / 1E5
+            )
+            poly.add(p)
+        }
+        return poly
+    }*/
+
     // Akcelerometar
 
     private fun setUpSensor() {
@@ -225,72 +338,4 @@ class MapsActivity : AppCompatActivity(),
         super.onDestroy()
     }
 
-    //ActivityRecognitionAPI
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            AppSettingsDialog.Builder(this).build().show()
-        } else {
-            requestActivityTransitionPermission()
-        }
-    }
-
-    fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        requestForUpdates()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-
-
-
-    @SuppressLint("MissingPermission")
-    private fun requestForUpdates() {
-        client
-            .requestActivityTransitionUpdates(
-                ActivityTransitionsUtil.getActivityTransitionRequest(),
-                getPendingIntent()
-            )
-            .addOnSuccessListener {
-                showToast("successful registration")
-            }
-            .addOnFailureListener { e: Exception ->
-                showToast("Unsuccessful registration")
-            }
-    }
-
-
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun requestActivityTransitionPermission() {
-        EasyPermissions.requestPermissions(
-            this,
-            "You need to allow activity transition permissions in order to use this feature",
-            Constants.REQUEST_CODE_ACTIVITY_TRANSITION,
-            Manifest.permission.ACTIVITY_RECOGNITION
-        )
-    }
-
-    private fun getPendingIntent(): PendingIntent {
-        val intent = Intent(this, ActivityTransitionReceiver::class.java)
-        return PendingIntent.getBroadcast(
-            this,
-            Constants.REQUEST_CODE_INTENT_ACTIVITY_TRANSITION,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG)
-            .show()
-    }
 }
