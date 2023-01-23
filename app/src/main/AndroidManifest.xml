@@ -75,13 +75,6 @@
             android:exported="true"
             android:parentActivityName=".MapsActivity"/>
 
-        <receiver android:name=".reciever.ActivityTransitionReceiver"
-            android:exported="false"
-            android:permission="com.google.android.gms.permission.ACTIVITY_RECOGNITION">
-            <intent-filter>
-                <action android:name="action.TRANSITIONS_DATA" />
-            </intent-filter>
-        </receiver>
 
     </application>
 
