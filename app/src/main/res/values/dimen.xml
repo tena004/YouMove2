@@ -2,4 +2,6 @@
 <resources>
     <dimen name="font_size">16dp</dimen>
     <dimen name="action_button_padding">50dp</dimen>
+    <dimen name="default_stroke_width">7dp</dimen>
+    <dimen name="default_background_stroke_width">3dp</dimen>
 </resources>

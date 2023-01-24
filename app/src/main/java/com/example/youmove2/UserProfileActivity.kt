@@ -41,25 +41,35 @@ class UserProfileActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
         }
         val fontSize= dbase!!.checkFont()
         if(fontSize==1){
-            viewBinding.walkedTextView.textSize = 16f
-            viewBinding.runnedTextView.textSize = 16f
+            viewBinding.metersTextView.textSize = 16f
+            viewBinding.stepsTextView.textSize = 16f
             viewBinding.levelTextView.textSize = 16f
         }else if(fontSize==2){
-            viewBinding.walkedTextView.textSize = 20f
-            viewBinding.runnedTextView.textSize = 20f
+            viewBinding.metersTextView.textSize = 20f
+            viewBinding.stepsTextView.textSize = 20f
             viewBinding.levelTextView.textSize = 20f
         }else{
-            viewBinding.walkedTextView.textSize = 24f
-            viewBinding.runnedTextView.textSize = 24f
+            viewBinding.metersTextView.textSize = 24f
+            viewBinding.stepsTextView.textSize = 24f
             viewBinding.levelTextView.textSize = 24f
         }
 
         dbase!!.getUserDetails(userData)
 
         viewBinding.imePrezimeTextView.text = userData?.get(0)
-        viewBinding.walkedTextView.append(userData?.get(1).toString())
-        viewBinding.runnedTextView.append(userData?.get(2).toString())
+        viewBinding.metersTextView.append(userData?.get(1).toString())
+        viewBinding.stepsTextView.append(userData?.get(2).toString())
         viewBinding.levelTextView.append(userData?.get(3).toString())
+
+        Toast.makeText(this, userData?.get(1).toString(), Toast.LENGTH_LONG).show()
+
+        /*viewBinding.resetBtn.setOnClickListener {
+            dbase!!.reset()
+            viewBinding.metersTextView.append("0.0")
+            viewBinding.stepsTextView.append("0.0")
+            viewBinding.levelTextView.append("0.0")
+
+        }*/
 
         viewBinding.logoutBtn.setOnClickListener {
             userData.clear()

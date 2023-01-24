@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".UserProfileActivity">
 
+
+
     <ImageView
         android:id="@+id/profilePhoto"
         android:layout_width="wrap_content"
@@ -22,69 +24,86 @@
         android:layout_height="25dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="36dp"
-        android:fontFamily="@font/julius"
-        android:text="TextView"
+        android:fontFamily="@font/raleway_extralight"
         android:textAllCaps="true"
+        android:text="TextView"
         android:textColor="@color/dark_gray"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/profilePhoto"
         app:layout_constraintTop_toTopOf="@+id/profilePhoto" />
 
     <TextView
-        android:id="@+id/walkedTextView"
-        android:layout_width="363dp"
-        android:layout_height="29dp"
+        android:id="@+id/metersTextView"
+        android:layout_width="match_parent"
+        android:layout_height="57dp"
         android:layout_marginTop="64dp"
-        android:fontFamily="@font/julius"
-        android:text="Metara prehodano:  "
+        android:fontFamily="@font/raleway_extralight"
+        android:text="Prijeđeno metara:  "
+        android:textAllCaps="true"
         android:textColor="@color/dark_gray"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="@+id/profilePhoto"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="@+id/profilePhoto"
         app:layout_constraintTop_toBottomOf="@+id/profilePhoto" />
 
     <TextView
-        android:id="@+id/runnedTextView"
-        android:layout_width="365dp"
-        android:layout_height="26dp"
+        android:id="@+id/stepsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:layout_marginTop="36dp"
-        android:fontFamily="@font/julius"
-        android:text="Metara pretrčano:  "
+        android:fontFamily="@font/raleway_extralight"
+        android:text="Broj koraka:  "
+        android:textAllCaps="true"
         android:textColor="@color/dark_gray"
         android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/walkedTextView"
+        app:layout_constraintEnd_toEndOf="@+id/metersTextView"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/walkedTextView"
-        app:layout_constraintTop_toBottomOf="@+id/walkedTextView" />
+        app:layout_constraintStart_toStartOf="@+id/metersTextView"
+        app:layout_constraintTop_toBottomOf="@+id/metersTextView" />
 
     <TextView
         android:id="@+id/levelTextView"
-        android:layout_width="363dp"
-        android:layout_height="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
         android:layout_marginTop="36dp"
-        android:fontFamily="@font/julius"
+        android:fontFamily="@font/raleway_extralight"
         android:text="Razina:  "
+        android:textAllCaps="true"
         android:textColor="@color/dark_gray"
         android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/runnedTextView"
+        app:layout_constraintEnd_toEndOf="@+id/stepsTextView"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/runnedTextView"
-        app:layout_constraintTop_toBottomOf="@+id/runnedTextView" />
+        app:layout_constraintStart_toStartOf="@+id/stepsTextView"
+        app:layout_constraintTop_toBottomOf="@+id/stepsTextView" />
 
     <Button
         android:id="@+id/logoutBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="76dp"
-        android:layout_marginBottom="160dp"
+        android:layout_marginBottom="84dp"
         android:background="@drawable/button2"
         android:fontFamily="@font/raleway_semibold"
         android:paddingBottom="10dp"
         android:text="Odjava"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imePrezimeTextView"
-        app:layout_constraintHorizontal_bias="0.08"
-        app:layout_constraintStart_toStartOf="@+id/levelTextView" />
+        app:layout_constraintEnd_toEndOf="@+id/resetBtn"
+        app:layout_constraintStart_toStartOf="@+id/resetBtn"
+        app:layout_constraintTop_toBottomOf="@+id/resetBtn" />
+
+    <Button
+        android:id="@+id/resetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:background="@drawable/button2"
+        android:fontFamily="@font/raleway_semibold"
+        android:paddingBottom="10dp"
+        android:text="Kreni ispočetka"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/levelTextView"
+        app:layout_constraintHorizontal_bias="0.44"
+        app:layout_constraintStart_toStartOf="@+id/levelTextView"
+        app:layout_constraintTop_toBottomOf="@+id/levelTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
