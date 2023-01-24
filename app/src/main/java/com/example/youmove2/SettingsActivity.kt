@@ -1,8 +1,10 @@
 package com.example.youmove2
 
 import android.os.Bundle
+import android.content.Intent
 import android.speech.tts.TextToSpeech
 import android.view.WindowManager
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,6 +34,17 @@ class SettingsActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
 
         dbase = Baza(this)
         tts = TextToSpeech(this,this)
+        val fontSize= dbase!!.checkFont()
+        if(fontSize==1){
+            viewBinding.ttsTxt.textSize = 16f
+            viewBinding.textView2.textSize = 16f
+        }else if(fontSize==2){
+            viewBinding.ttsTxt.textSize = 20f
+            viewBinding.textView2.textSize = 20f
+        }else{
+            viewBinding.ttsTxt.textSize = 24f
+            viewBinding.textView2.textSize = 24f
+        }
 
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
@@ -45,6 +58,54 @@ class SettingsActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
                 speakOut("Text to speech off")
             }
         }
+
+        viewBinding.ttsOnOff.isChecked = dbase!!.checkTtS()
+        viewBinding.seekBar2.setProgress(fontSize-1)
+        viewBinding.seekBar2.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+
+            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+                return
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+                if(p0?.progress==0){
+                    if(dbase!!.checkTtS()) speakOut("Font size set to 16")
+                    dbase!!.fontSize(1)
+                    viewBinding.ttsTxt.textSize = 16f
+                    viewBinding.textView2.textSize = 16f
+                    overridePendingTransition(0,0)
+                    finish()
+                    overridePendingTransition(0,0)
+                    startActivity(intent)
+                    overridePendingTransition(0,0)
+                }
+                if(p0?.progress==1){
+                    if(dbase!!.checkTtS()) speakOut("Font size set to 20")
+                    dbase!!.fontSize(2)
+                    viewBinding.ttsTxt.textSize = 20f
+                    viewBinding.textView2.textSize = 20f
+                    overridePendingTransition(0,0)
+                    finish()
+                    overridePendingTransition(0,0)
+                    startActivity(intent)
+                    overridePendingTransition(0,0)
+                }
+                if(p0?.progress==2){
+                    if(dbase!!.checkTtS()) speakOut("Font size set to 24")
+                    dbase!!.fontSize(3)
+                    viewBinding.ttsTxt.textSize = 24f
+                    viewBinding.textView2.textSize = 24f
+                    overridePendingTransition(0,0)
+                    finish()
+                    overridePendingTransition(0,0)
+                    startActivity(intent)
+                    overridePendingTransition(0,0)
+                }
+            }
+        }
+        )
     }
 
     private fun speakOut(text: String) {

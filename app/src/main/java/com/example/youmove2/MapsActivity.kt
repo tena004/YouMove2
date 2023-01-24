@@ -4,19 +4,23 @@ import android.Manifest
 import android.R.attr
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.os.AsyncTask
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,24 +34,42 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import com.google.android.libraries.places.api.Places
 import java.util.*
 
+
+@Suppress("DEPRECATION")
 class MapsActivity : AppCompatActivity(),
-    OnMapReadyCallback, SensorEventListener, /*EasyPermissions.PermissionCallbacks,*/ TextToSpeech.OnInitListener{
-    private lateinit var mMap: GoogleMap
+    OnMapReadyCallback, SensorEventListener, TextToSpeech.OnInitListener{
+
+    //BINDING
     private lateinit var binding: ActivityMapsBinding
-    private var initial_zoom = 14f
+
+    //TTS
     private var tts: TextToSpeech? = null
+
+    //BAZA
+    private lateinit var dbase : Baza
+
+    // GEOFENCING
     private val GEOFENCE_RADIUS = 1000f
     private val GEOFENCE_ID = 101
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var geofenceHelper: GeofenceHelper
-    private lateinit var sensorManager: SensorManager
+
+    // MAPA
+    private lateinit var mMap: GoogleMap
+    private var initial_zoom = 14f
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var home : LatLng
     private lateinit var goal : LatLng
+
+    // STEP COUNTER SESNOR
+    private lateinit var sensorManager: SensorManager
+    //STEP COUNTER VERIJABLE
+    private var totalSteps = 0f
+    private var previousTotalSteps = 0f
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -84,23 +106,49 @@ class MapsActivity : AppCompatActivity(),
         window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
 
-        setUpSensor()
-
         super.onCreate(savedInstanceState)
 
+        // step counter
+        //loadData()
+        if (ContextCompat.checkSelfPermission(this@MapsActivity, Manifest.permission.ACTIVITY_RECOGNITION)
+            != PackageManager.PERMISSION_GRANTED) {
+            val REQUEST_PERMISSIONS_REQUEST_CODE = 2
+            ActivityCompat.requestPermissions(this@MapsActivity,
+                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        if (stepSensor == null) {
+            // This will give a toast message to the user if there is no sensor in the device
+            Toast.makeText(this, "No sensor detected on this device", Toast.LENGTH_SHORT).show()
+        } else {
+            stepSensor?.let {
+                sensorManager.registerListener(this@MapsActivity, it, SensorManager.SENSOR_DELAY_FASTEST)
+            }
+            Toast.makeText(this, "senzor ukljucen", Toast.LENGTH_SHORT).show()
+        }
+
+        //geofencing
         geofencingClient = LocationServices.getGeofencingClient(this)
         geofenceHelper = GeofenceHelper(this);
 
+        //tts
         tts = TextToSpeech(this,this)
 
+        // binding i view
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.stepCounter.setTextColor(Color.BLACK)
+
+        Places.initialize(applicationContext,"AIzaSyDJWKoZ6HakS0tUeuy7GzYYN6PA_N3hE-I");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-           .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
     }
@@ -110,7 +158,6 @@ class MapsActivity : AppCompatActivity(),
         mMap = googleMap
         enableMyLocation();
         home = LatLng(0.0, 0.0)
-        //var bm : Bitmap = decodeResource(this.getResources(), R.drawable.finish)
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -119,7 +166,6 @@ class MapsActivity : AppCompatActivity(),
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? -> // Got last known location. In some rare situations this can be null.
                 home = if (location != null) {
-                    // Pan the camera to location
                     LatLng(location.latitude, location.longitude)
                 } else {
                     LatLng(43.640278, 19.108334)
@@ -128,26 +174,33 @@ class MapsActivity : AppCompatActivity(),
                     MarkerOptions()
                         .position(home)
                         .draggable(true)
-
+                        .title("Krenite")
                 )
-
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, initial_zoom))
-                goal = getRandomMarker(home, GEOFENCE_RADIUS)
-                mMap.addMarker(
-                    MarkerOptions()
-                        .position(goal)
-                       // .icon(BitmapDescriptorFactory.fromBitmap(bm))
-                )
-                }
+                addGeofence(home, GEOFENCE_RADIUS);
+            }
 
-        addGeofence(home, GEOFENCE_RADIUS);
+        mMap.setOnMapLongClickListener {
+            mMap.addMarker(
+                MarkerOptions()
+                    .position(it)
+                    .icon(bitmapDescriptorFromVector(applicationContext, R.drawable.finish))
+            )
+        }
 
         mMap.isMyLocationEnabled = true // Show current location
-
-        val url: String = getMapsApiDirectionsUrl(home, goal)
-
     }
 
+    private fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescriptor? {
+        return ContextCompat.getDrawable(context, vectorResId)?.run {
+            setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+            val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+            draw(Canvas(bitmap))
+            BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
+    }
+
+    //Ako aplikacija sama stavlja marker
     fun getRandomMarker(point: LatLng, radius: Float): LatLng {
         val randomPoints: MutableList<LatLng> = ArrayList()
         val randomDistances: MutableList<Float> = ArrayList()
@@ -182,7 +235,7 @@ class MapsActivity : AppCompatActivity(),
             randomDistances.add(l1.distanceTo(myLocation))
         }
         //Get nearest point to the centre
-        val indexOfNearestPointToCentre = randomDistances.indexOf(Collections.min(randomDistances))
+        val indexOfNearestPointToCentre = randomDistances.indexOf(Collections.max(randomDistances))
         return randomPoints[indexOfNearestPointToCentre]
     }
 
@@ -247,95 +300,67 @@ class MapsActivity : AppCompatActivity(),
             }
     }
 
-    private fun getMapsApiDirectionsUrl(origin: LatLng, dest: LatLng): String {
+    // Step cunter
 
-        // Origin of route
-        val str_origin = "origin=" + origin.latitude + "," + origin.longitude
-
-        // Destination of route
-        val str_dest = "destination=" + dest.latitude + "," + dest.longitude
-
-        // Sensor enabled
-        val sensor = "sensor=false"
-
-        // Building the parameters to the web service
-        val parameters = "$str_origin&$str_dest&$sensor"
-
-        // Output format
-        val output = "json"
-        return "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
+    override fun onSensorChanged(event: SensorEvent?) {
+        event ?: return
+        // Data 1: According to official documentation, the first value of the `SensorEvent` value is the step count
+        event.values.firstOrNull()?.let {
+            //dbase.updateHodanje(it)
+            binding.stepCounter.setText("$it")
+            Toast.makeText(applicationContext, "Step count: $it ", Toast.LENGTH_LONG).show()
+        }
     }
 
-   /*
-
-    private fun decodePoly(encoded: String): List<LatLng>? {
-        val poly: MutableList<LatLng> = ArrayList()
-        var index = 0
-        val len = encoded.length
-        var lat = 0
-        var lng = 0
-        while (index < len) {
-            var b: Int
-            var shift = 0
-            var result = 0
-            do {
-                b = encoded[index++].code - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lat += dlat
-            shift = 0
-            result = 0
-            do {
-                b = encoded[index++].code - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lng += dlng
-            val p = LatLng(
-                lat.toDouble() / 1E5,
-                lng.toDouble() / 1E5
-            )
-            poly.add(p)
+    /*fun resetSteps() {
+        var stepsTaken : TextView = findViewById(R.id.stepCounter)
+        stepsTaken.setOnClickListener {
+            // This will give a toast message if the user want to reset the steps
+            Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
         }
-        return poly
+
+        stepsTaken.setOnLongClickListener {
+
+            // previousTotalSteps = totalSteps VUĆI IZ BAZE
+
+            // When the user will click long tap on the screen,
+            // the steps will be reset to 0
+            stepsTaken.text = 0.toString()
+
+            // This will save the data
+            //saveData()
+
+            true
+        }
     }*/
 
-    // Akcelerometar
+    /*private fun saveData() {
 
-    private fun setUpSensor() {
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        // Shared Preferences will allow us to save
+        // and retrieve data in the form of key,value pair.
+        // In this function we will save data
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
 
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also{
-            sensorManager.registerListener(
-                this,
-                it,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                SensorManager.SENSOR_DELAY_NORMAL)
-        }
+        val editor = sharedPreferences.edit()
+        editor.putFloat("key1", previousTotalSteps)
+        editor.apply()
+    }*/
 
+    /*private fun loadData() {
 
-    }
-    override fun onSensorChanged(event: SensorEvent?) {
-        /*if (event != null) {
-            Log.d(
-                "acc", "x = ${event.values[0]}\n\n" +
-                        "y = ${event.values[1]}\n\n" +
-                        "z = ${event.values[2]}\n\n"
-            )
-        }*/
-    }
+        // In this function we will retrieve data
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val savedNumber = sharedPreferences.getFloat("key1", 0f)
 
-    // Akcelerometar
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-        return
-    }
+        // Log.d is used for debugging purposes
+        Log.d("MainActivity", "$savedNumber")
 
-    override fun onDestroy() {
-        sensorManager.unregisterListener(this)
-        super.onDestroy()
+        previousTotalSteps = savedNumber
+    }*/
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // We do not have to write anything in this function for this app
     }
 
 }
+

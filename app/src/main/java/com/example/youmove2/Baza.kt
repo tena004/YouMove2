@@ -16,7 +16,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME , null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "hodanje" + " double default 0," + "trcanje" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1," + "tts" + " integer default 0," + "font" + " integer default 0);"
+        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "hodanje" + " double default 0," + "trcanje" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1," + "tts" + " integer default 0," + "fontSize" + " integer default 0);"
         db.execSQL(createUserTable)
         val createUniqueIndex = "CREATE UNIQUE INDEX IF NOT EXISTS korisnik_ui ON korisnik(kor_ime)"
         db.execSQL(createUniqueIndex)
@@ -161,7 +161,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
         }
     }
 
-    fun checkTtS(id: Int): Boolean{
+    fun checkTtS(): Boolean{
         var id = this.getLoggedInUser()
         val queryLogOut = "SELECT tts FROM korisnik WHERE _id = $id;"
         var cursor: Cursor? = null
@@ -179,7 +179,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
 
     fun fontSize(i: Int){
         var id = this.getLoggedInUser()
-        val queryLogOut = "UPDATE korisnik SET font = $i WHERE _id = $id;"
+        val queryLogOut = "UPDATE korisnik SET fontSize = $i WHERE _id = $id;"
         var cursor: Cursor? = null
         val db = this.writableDatabase
         if (db != null && id != -1) {
@@ -191,15 +191,15 @@ class Baza(context: Context) : SQLiteOpenHelper(
 
     fun checkFont(): Int{
         var id = this.getLoggedInUser()
-        val queryLogOut = "SELECT font FROM korisnik WHERE _id = $id;"
+        val queryLogOut = "SELECT fontSize FROM korisnik WHERE _id = $id;"
         var cursor: Cursor? = null
         val db = this.readableDatabase
         if (db != null && id != -1) {
             cursor = db.rawQuery(queryLogOut, null)
             cursor!!.moveToFirst()
-            var font = cursor!!.getInt(0)
+            var fontSize = cursor!!.getInt(0)
             cursor.close()
-            return  font
+            return  fontSize
         }else{
             return -1
         }

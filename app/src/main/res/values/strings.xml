@@ -4,11 +4,4 @@
     <string name="font_size">16dp</string>
     <string name="logo">logo</string>
     <string name="settings">SETTINGS</string>
-
-
-
-    <string name="activity_walking">walking</string>
-    <string name="activity_running">Running</string>
-    <string name="activity_still">Still</string>
-    <string name="activity_unknown">Unknown</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.example.youmove2
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.view.Window

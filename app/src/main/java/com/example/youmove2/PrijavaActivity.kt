@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.youmove2.databinding.ActivityPrijavaBinding
 import com.google.common.hash.Hashing
-import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 
 class PrijavaActivity : AppCompatActivity() {

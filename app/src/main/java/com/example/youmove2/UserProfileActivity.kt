@@ -36,15 +36,30 @@ class UserProfileActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
         setContentView(viewBinding.root)
 
         tts = TextToSpeech(this,this)
+        if(dbase!!.checkTtS()){
+            //speakOut(viewBinding.imePrezimeTextView.text.toString() + "Meters walked: " + userData?.get(1).toString() + "Meters run: " + userData?.get(2).toString() + "level:" + userData?.get(3).toString())
+        }
+        val fontSize= dbase!!.checkFont()
+        if(fontSize==1){
+            viewBinding.walkedTextView.textSize = 16f
+            viewBinding.runnedTextView.textSize = 16f
+            viewBinding.levelTextView.textSize = 16f
+        }else if(fontSize==2){
+            viewBinding.walkedTextView.textSize = 20f
+            viewBinding.runnedTextView.textSize = 20f
+            viewBinding.levelTextView.textSize = 20f
+        }else{
+            viewBinding.walkedTextView.textSize = 24f
+            viewBinding.runnedTextView.textSize = 24f
+            viewBinding.levelTextView.textSize = 24f
+        }
 
         dbase!!.getUserDetails(userData)
 
-        viewBinding.imePrezimeTextView.setText(userData?.get(0))
+        viewBinding.imePrezimeTextView.text = userData?.get(0)
         viewBinding.walkedTextView.append(userData?.get(1).toString())
         viewBinding.runnedTextView.append(userData?.get(2).toString())
         viewBinding.levelTextView.append(userData?.get(3).toString())
-
-
 
         viewBinding.logoutBtn.setOnClickListener {
             userData.clear()
@@ -64,7 +79,6 @@ class UserProfileActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
                 Toast.makeText(this, "Language specified not supported", Toast.LENGTH_SHORT).show()
             }
-            speakOut(viewBinding.imePrezimeTextView.text.toString() + "Meters walked: " + userData?.get(1).toString() + "Meters run: " + userData?.get(2).toString() + "level:" + userData?.get(3).toString())
         }
     }
 }
