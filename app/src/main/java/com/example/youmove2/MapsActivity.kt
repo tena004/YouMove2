@@ -40,6 +40,7 @@ import com.google.android.libraries.places.api.Places
 import java.util.*
 
 
+
 @Suppress("DEPRECATION")
 class MapsActivity : AppCompatActivity(),
     OnMapReadyCallback, SensorEventListener, TextToSpeech.OnInitListener{
@@ -63,7 +64,6 @@ class MapsActivity : AppCompatActivity(),
     private lateinit var mMap: GoogleMap
     private var initial_zoom = 14f
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var generate: Boolean = false
     var goal : Marker? = null
 
     // STEP COUNTER SESNOR
@@ -141,9 +141,7 @@ class MapsActivity : AppCompatActivity(),
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if(dbase!!.getGenerate() == 1){
-            generate = true
-        }
+
 
         binding.stepCounter.setTextColor(Color.BLACK)
 
@@ -159,16 +157,14 @@ class MapsActivity : AppCompatActivity(),
         mapFragment.getMapAsync(this)
 
         binding.startStopBtn.setOnClickListener{
-            if(binding.startStopBtn.text == "Stop") {
                 dbase.updateKoraciPrijedeno(totalSteps, totalSteps * 0.75f)
                 totalSteps = 0f
                 binding.stepCounter.text = "Broj koraka: " + totalSteps.toString()
-                goal?.remove()
-                binding.startStopBtn.text = "Start"
-            }else{
-                popUpWindow()
-                binding.startStopBtn.text = "Stop"
-            }
+                overridePendingTransition(0, 0)
+                finish();
+                overridePendingTransition(0, 0)
+                startActivity(intent);
+                overridePendingTransition(0, 0)
         }
 
     }
@@ -178,7 +174,6 @@ class MapsActivity : AppCompatActivity(),
         if (requestCode == 1000 && resultCode == Activity.RESULT_OK) {
             var pom = data!!.getBooleanExtra("generate", false)
             dbase.generate(pom)
-
         }
     }
 
@@ -188,6 +183,7 @@ class MapsActivity : AppCompatActivity(),
         enableMyLocation();
         var home: LatLng
         home = LatLng(0.0,0.0)
+        Toast.makeText(applicationContext, generate.toString(), Toast.LENGTH_LONG).show()
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -363,6 +359,10 @@ class MapsActivity : AppCompatActivity(),
     fun popUpWindow(){
         val iPopUpWindow = Intent(this, PopUpWindow::class.java)
         startActivityForResult(iPopUpWindow,1000)
+    }
+
+    companion object Generiraj{
+        var generate: Boolean = false
     }
 
 }

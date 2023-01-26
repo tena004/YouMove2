@@ -95,6 +95,7 @@ class PopUpWindow : AppCompatActivity() {
         // After animation finish, close the Activity
         colorAnimation.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
+                MapsActivity.generate = false
                 val mapsScreen = Intent(applicationContext, MapsActivity::class.java)
                 mapsScreen.putExtra("generate", false)
                 setResult(Activity.RESULT_OK, mapsScreen)
@@ -125,6 +126,7 @@ class PopUpWindow : AppCompatActivity() {
         // After animation finish, close the Activity
         colorAnimation.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
+                MapsActivity.generate = true
                 val mapsScreen = Intent(applicationContext, MapsActivity::class.java)
                 mapsScreen.putExtra("generate", true)
                 setResult(Activity.RESULT_OK, mapsScreen)
