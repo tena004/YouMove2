@@ -64,6 +64,7 @@ class MapsActivity : AppCompatActivity(),
     private var initial_zoom = 14f
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var generate: Boolean = false
+    var goal : Marker? = null
 
     // STEP COUNTER SESNOR
     private lateinit var sensorManager: SensorManager
@@ -161,7 +162,8 @@ class MapsActivity : AppCompatActivity(),
             if(binding.startStopBtn.text == "Stop") {
                 dbase.updateKoraciPrijedeno(totalSteps, totalSteps * 0.75f)
                 totalSteps = 0f
-                binding.stepCounter.text = totalSteps.toString()
+                binding.stepCounter.text = "Broj koraka: " + totalSteps.toString()
+                goal?.remove()
                 binding.startStopBtn.text = "Start"
             }else{
                 popUpWindow()
@@ -204,18 +206,16 @@ class MapsActivity : AppCompatActivity(),
                         .draggable(true)
                         .title("Krenite")
                 )
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, initial_zoom))
-                addGeofence(home, GEOFENCE_RADIUS);
                 if (generate){
                     val nova = getRandomMarker(home, GEOFENCE_RADIUS)
-                    mMap.addMarker(
+                    goal = mMap.addMarker(
                         MarkerOptions()
                             .position(nova)
                             .icon(bitmapDescriptorFromVector(applicationContext, R.drawable.finish))
                     )
                 }else{
                     mMap.setOnMapLongClickListener {
-                        mMap.addMarker(
+                        goal = mMap.addMarker(
                             MarkerOptions()
                                 .position(it)
                                 .icon(
@@ -227,6 +227,7 @@ class MapsActivity : AppCompatActivity(),
                         )
                     }
                 }
+                addGeofence(home, GEOFENCE_RADIUS);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, initial_zoom))
             }
 
