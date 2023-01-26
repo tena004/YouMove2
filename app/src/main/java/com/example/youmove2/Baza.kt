@@ -15,7 +15,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME , null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "prijedjeno" + " double default 0," + "koraci" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1," + "tts" + " integer default 0," + "font" + " integer default 0," + "generiraj" + " integer default 0);"
+        val createUserTable = "create table korisnik (" + "_id" + " integer primary key autoincrement, " + "ime" + " text not null, " + "kor_ime" + " text not null, " + "lozinka" + " text not null," + "prijedjeno" + " double default 0," + "koraci" + " double default 0," + "level" + " integer default 1," + "ulogiran" + " integer default 1," + "tts" + " integer default 0," + "font" + " integer default 0);"
         db.execSQL(createUserTable)
         val createUniqueIndex = "CREATE UNIQUE INDEX IF NOT EXISTS korisnik_ui ON korisnik(kor_ime)"
         db.execSQL(createUniqueIndex)
@@ -214,7 +214,7 @@ class Baza(context: Context) : SQLiteOpenHelper(
             cursor!!.moveToFirst()
             cursor.close()
         }
-        updateLevel()
+        this.updateLevel()
     }
 
 
@@ -233,8 +233,9 @@ class Baza(context: Context) : SQLiteOpenHelper(
             level = cursorlevel!!.getInt(1)
             cursorlevel.close()
         }
-        if(floor(metri/level*1000) ==1f){
-            val queryLogOut = "UPDATE korisnik SET level = level + 1 WHERE _id = $id;"
+        if(floor(metri/(level*1000)) >= 1f){
+            var lvl = floor(metri/(level*1000))
+            val queryLogOut = "UPDATE korisnik SET level = level + $lvl WHERE _id = $id;"
             var cursor: Cursor? = null
             if (db != null && id != -1) {
                 cursor = db.rawQuery(queryLogOut, null)
@@ -258,37 +259,5 @@ class Baza(context: Context) : SQLiteOpenHelper(
         }
 
     }
-
-    fun generate(boolean: Boolean){
-        var id = this.getLoggedInUser()
-        var queryLogOut = "UPDATE korisnik SET generiraj = 0 WHERE _id = $id;"
-        if(boolean) queryLogOut = "UPDATE korisnik SET generiraj = 1 WHERE _id = $id;"
-        var cursor: Cursor? = null
-        val db = this.writableDatabase
-        if (db != null && id != -1) {
-            cursor = db.rawQuery(queryLogOut, null)
-            cursor!!.moveToFirst()
-            cursor.close()
-        }
-
-    }
-
-    fun getGenerate(): Int{
-        var id = this.getLoggedInUser()
-        val queryLogOut = "SELECT generiraj FROM korisnik WHERE _id = $id;"
-        var cursor: Cursor? = null
-        val db = this.readableDatabase
-        if (db != null && id != -1) {
-            cursor = db.rawQuery(queryLogOut, null)
-            cursor!!.moveToFirst()
-            var generiraj = cursor!!.getInt(0)
-            cursor.close()
-            return  generiraj
-        }else{
-            return -1
-        }
-    }
-
-
 }
 

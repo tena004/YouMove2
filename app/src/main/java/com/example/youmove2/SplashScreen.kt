@@ -42,7 +42,7 @@ class SplashScreen: AppCompatActivity() {
                 startActivity(iHomeScreen)
                 finish()
             }else{
-                val iMaps = Intent(this@SplashScreen, MapsActivity::class.java)
+                val iMaps = Intent(this@SplashScreen, PopUpWindow::class.java)
                 startActivity(iMaps)
                 finish()
             }

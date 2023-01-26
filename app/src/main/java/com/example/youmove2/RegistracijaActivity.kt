@@ -58,7 +58,7 @@ class RegistracijaActivity : AppCompatActivity() {
                 if(registracija){
                     dbase!!.prijavaProvjera(korIme, lozinka)
                     Toast.makeText(this, "Uspješno ste registrirani!", Toast.LENGTH_LONG).show()
-                    val iMaps = Intent(this, MapsActivity::class.java)
+                    val iMaps = Intent(this, PopUpWindow::class.java)
                     startActivity(iMaps)
                 }else{
                     Toast.makeText(

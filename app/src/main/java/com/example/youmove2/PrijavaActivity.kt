@@ -43,7 +43,7 @@ class PrijavaActivity : AppCompatActivity() {
                         "Pogrešno korisničko ime ili lozinka!",
                         Toast.LENGTH_SHORT).show()
                 }else{
-                    val iMapa = Intent(this, MapsActivity::class.java)
+                    val iMapa = Intent(this, PopUpWindow::class.java)
                     startActivity(iMapa)
                 }
             }

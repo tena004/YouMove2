@@ -3,7 +3,6 @@ package com.example.youmove2
 import android.Manifest
 import android.R.attr
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -21,7 +20,6 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -36,9 +34,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.libraries.places.api.Places
 import java.util.*
-
 
 
 @Suppress("DEPRECATION")
@@ -55,7 +51,7 @@ class MapsActivity : AppCompatActivity(),
     private var dbase : Baza = Baza(this)
 
     // GEOFENCING
-    private val GEOFENCE_RADIUS = 1000f
+    private val GEOFENCE_RADIUS = 500f
     private val GEOFENCE_ID = 101
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var geofenceHelper: GeofenceHelper
@@ -65,6 +61,7 @@ class MapsActivity : AppCompatActivity(),
     private var initial_zoom = 14f
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     var goal : Marker? = null
+    var generate : Boolean = false
 
     // STEP COUNTER SESNOR
     private lateinit var sensorManager: SensorManager
@@ -108,7 +105,8 @@ class MapsActivity : AppCompatActivity(),
 
         super.onCreate(savedInstanceState)
 
-        popUpWindow()
+        var intent : Intent = getIntent()
+        generate = intent.getBooleanExtra("generate", false)
 
         // step counter
         //loadData()
@@ -141,40 +139,26 @@ class MapsActivity : AppCompatActivity(),
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         binding.stepCounter.setTextColor(Color.BLACK)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Dohvat podataka iz baze za korake i metre
-        //dbase!!.getUserDetails(userData)
-        //// previousTotalSteps =
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         binding.startStopBtn.setOnClickListener{
+            if(dbase.checkTtS()) speakOut("You stopped step counting. You made " + totalSteps + " steps and " + totalSteps * 0.75f + " meters.")
                 dbase.updateKoraciPrijedeno(totalSteps, totalSteps * 0.75f)
                 totalSteps = 0f
                 binding.stepCounter.text = "Broj koraka: " + totalSteps.toString()
                 overridePendingTransition(0, 0)
                 finish();
                 overridePendingTransition(0, 0)
-                startActivity(intent);
+                popUpWindow()
                 overridePendingTransition(0, 0)
         }
 
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1000 && resultCode == Activity.RESULT_OK) {
-            var pom = data!!.getBooleanExtra("generate", false)
-            dbase.generate(pom)
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -183,7 +167,6 @@ class MapsActivity : AppCompatActivity(),
         enableMyLocation();
         var home: LatLng
         home = LatLng(0.0,0.0)
-        Toast.makeText(applicationContext, generate.toString(), Toast.LENGTH_LONG).show()
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -342,7 +325,6 @@ class MapsActivity : AppCompatActivity(),
     }
 
     // Step cunter
-
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         // Data 1: According to official documentation, the first value of the `SensorEvent` value is the step count
@@ -358,12 +340,14 @@ class MapsActivity : AppCompatActivity(),
 
     fun popUpWindow(){
         val iPopUpWindow = Intent(this, PopUpWindow::class.java)
-        startActivityForResult(iPopUpWindow,1000)
+        startActivity(iPopUpWindow)
     }
 
-    companion object Generiraj{
-        var generate: Boolean = false
+    override fun onBackPressed() {
+        val exitIntent = Intent(Intent.ACTION_MAIN)
+        exitIntent.addCategory(Intent.CATEGORY_HOME)
+        exitIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(exitIntent)
     }
-
 }
 

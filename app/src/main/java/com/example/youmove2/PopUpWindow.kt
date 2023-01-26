@@ -10,24 +10,32 @@ import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.widget.Toast
 import androidx.core.graphics.ColorUtils
 import com.example.youmove2.databinding.ActivityPopUpWindowBinding
+import java.util.*
 
-class PopUpWindow : AppCompatActivity() {
+class PopUpWindow : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private lateinit var viewBinding : ActivityPopUpWindowBinding
     private var darkStatusBar = false
+    //BAZA
+    private var dbase : Baza = Baza(this)
+    //TTS
+    private var tts: TextToSpeech? = null
     override fun onCreate(savedInstanceState: Bundle?) {
 
         viewBinding = ActivityPopUpWindowBinding.inflate(layoutInflater)
 
-
         super.onCreate(savedInstanceState)
         overridePendingTransition(0, 0)
         setContentView(viewBinding.root)
+
+        tts = TextToSpeech(this,this)
 
         if (Build.VERSION.SDK_INT in 19..20) {
             setWindowFlag(this, true)
@@ -95,11 +103,10 @@ class PopUpWindow : AppCompatActivity() {
         // After animation finish, close the Activity
         colorAnimation.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                MapsActivity.generate = false
+                if(dbase.checkTtS()) speakOut("Choose your goal. You can start moving.")
                 val mapsScreen = Intent(applicationContext, MapsActivity::class.java)
                 mapsScreen.putExtra("generate", false)
-                setResult(Activity.RESULT_OK, mapsScreen)
-                finish()
+                startActivity(mapsScreen)
                 overridePendingTransition(0, 0)
             }
         })
@@ -126,11 +133,10 @@ class PopUpWindow : AppCompatActivity() {
         // After animation finish, close the Activity
         colorAnimation.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                MapsActivity.generate = true
+                if(dbase.checkTtS()) speakOut("Your goal is generated. You can start moving.")
                 val mapsScreen = Intent(applicationContext, MapsActivity::class.java)
                 mapsScreen.putExtra("generate", true)
-                setResult(Activity.RESULT_OK, mapsScreen)
-                finish()
+                startActivity(mapsScreen)
                 overridePendingTransition(0, 0)
             }
         })
@@ -147,6 +153,20 @@ class PopUpWindow : AppCompatActivity() {
         }
         win.attributes = winParams
     }
+
+    private fun speakOut(text: String) {
+        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts!!.setLanguage(Locale.US)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                Toast.makeText(this, "Language specified not supported", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
 
 
