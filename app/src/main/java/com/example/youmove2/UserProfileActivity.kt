@@ -57,19 +57,18 @@ class UserProfileActivity: AppCompatActivity(), TextToSpeech.OnInitListener {
         dbase!!.getUserDetails(userData)
 
         viewBinding.imePrezimeTextView.text = userData?.get(0)
-        viewBinding.metersTextView.append(userData?.get(1).toString())
-        viewBinding.stepsTextView.append(userData?.get(2).toString())
-        viewBinding.levelTextView.append(userData?.get(3).toString())
+        viewBinding.metersTextView.text = "Prijeđeno metara:  " + userData?.get(1).toString()
+        viewBinding.stepsTextView.text = "Broj koraka:  " + userData?.get(2).toString()
+        viewBinding.levelTextView.text = "Razina:  " + userData?.get(3).toString()
 
-        Toast.makeText(this, userData?.get(1).toString(), Toast.LENGTH_LONG).show()
 
-        /*viewBinding.resetBtn.setOnClickListener {
+        viewBinding.resetBtn.setOnClickListener {
             dbase!!.reset()
-            viewBinding.metersTextView.append("0.0")
-            viewBinding.stepsTextView.append("0.0")
-            viewBinding.levelTextView.append("0.0")
+            viewBinding.metersTextView.text = "Prijeđeno metara: 0.0"
+            viewBinding.stepsTextView.text = "Broj koraka: 0.0"
+            viewBinding.levelTextView.text = "Razina: 1"
 
-        }*/
+        }
 
         viewBinding.logoutBtn.setOnClickListener {
             userData.clear()

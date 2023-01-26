@@ -40,6 +40,10 @@
             android:name=".MainActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".PopUpWindow"
+            android:exported="false">
+        </activity>
         <activity android:name=".MapsActivity"
             android:exported="true"
             android:label="YouMove"/>
